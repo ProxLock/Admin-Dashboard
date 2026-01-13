@@ -10,7 +10,7 @@ interface UserActionModalProps {
 }
 
 export default function UserActionModal({ isOpen, onClose, user }: UserActionModalProps) {
-    const [overrideLimit, setOverrideLimit] = useState(user.overrideRequestLimit?.toString() || '');
+    const [overrideLimit, setOverrideLimit] = useState((user.overrideRequestLimit ?? user.requestLimit)?.toString() || '');
     const [updating, setUpdating] = useState(false);
 
     if (!isOpen) return null;
@@ -31,21 +31,16 @@ export default function UserActionModal({ isOpen, onClose, user }: UserActionMod
         }
     };
 
-    const handleOtherAction = async () => {
+    const handleRemoveOverride = async () => {
         setUpdating(true);
         try {
-            // Using the endpoint mentioned: /admin/:userID/user
-            // Assuming this is for some generic action, maybe reset?
-            // The prompt says "To take other actions for a user, do /admin/:userID/user" without specifying body.
-            // I'll assume it's a POST, maybe needs a body. I'll just send empty for now or maybe this was meant to be a GET for details?
-            // "To take other actions" usually implies POST/PUT. 
-            // I'll leave it as a placeholder action for now.
-            await api.post(`/admin/${user.id}/user`, {});
-            alert("Action executed");
+            await api.post(`/admin/${user.id}/user/override-limit`, null, {
+                headers: { 'Content-Type': 'application/json' }
+            });
             onClose(true);
         } catch (err) {
-            console.error("Failed to execute action", err);
-            alert("Failed to execute action");
+            console.error("Failed to remove override limit", err);
+            alert("Failed to remove override limit");
         } finally {
             setUpdating(false);
         }
@@ -95,11 +90,11 @@ export default function UserActionModal({ isOpen, onClose, user }: UserActionMod
                 <div className="actions-row" style={{ justifyContent: 'flex-end', marginTop: '2rem' }}>
                     <button
                         className="btn-solid"
-                        onClick={handleOtherAction}
+                        onClick={handleRemoveOverride}
                         disabled={updating}
-                        style={{ marginRight: 'auto', backgroundColor: 'var(--btn-secondary-bg)', borderColor: 'var(--btn-secondary-border)' }}
+                        style={{ marginRight: 'auto', backgroundColor: 'var(--btn-secondary-bg)', borderColor: 'var(--btn-secondary-border)', color: 'var(--color-error)' }}
                     >
-                        Other Action
+                        Remove Override
                     </button>
 
                     <button
