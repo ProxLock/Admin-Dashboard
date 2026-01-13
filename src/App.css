@@ -4517,6 +4517,9 @@ body {
 /* Lookup Result */
 .lookup-result {
   animation: fadeIn 0.3s ease;
+  max-width: 100%;
+  overflow: hidden;
+  box-sizing: border-box;
 }
 
 .lookup-user-header {
@@ -4584,6 +4587,9 @@ body {
   background-color: var(--bg-input);
   border-radius: 8px;
   border: 1px solid var(--border-default);
+  box-sizing: border-box;
+  max-width: 100%;
+  overflow: hidden;
 }
 
 .lookup-config-title {
@@ -4657,6 +4663,8 @@ body {
 /* Raw Data */
 .lookup-raw-data {
   margin-top: 1rem;
+  max-width: 100%;
+  overflow: hidden;
 }
 
 .lookup-raw-data summary {
@@ -4670,9 +4678,13 @@ body {
   background-color: var(--bg-code);
   padding: 1rem;
   border-radius: 8px;
-  overflow: auto;
+  overflow-x: auto;
   font-size: 0.85rem;
   color: var(--text-secondary);
+  max-width: 100%;
+  box-sizing: border-box;
+  white-space: pre-wrap;
+  word-break: break-word;
 }
 
 @keyframes fadeIn {
@@ -4699,6 +4711,28 @@ body {
 
   .lookup-config-actions button {
     width: 100%;
+  }
+
+  .lookup-config-input-row {
+    flex-wrap: wrap;
+  }
+
+  .lookup-config-input {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .lookup-checkbox-label {
+    width: 100%;
+    margin-top: 0.5rem;
+  }
+
+  .lookup-stats-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .lookup-user-id {
+    word-break: break-all;
   }
 }
 
