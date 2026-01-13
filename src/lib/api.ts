@@ -1,4 +1,5 @@
 import axios from 'axios';
+import type { User } from '../models';
 
 export const api = axios.create({
     baseURL: import.meta.env.VITE_API_URL || 'http://localhost:8080',
@@ -20,3 +21,8 @@ api.interceptors.request.use(async (config) => {
     return Promise.reject(error);
 });
 
+
+export const lookupUser = async (userId: string): Promise<User> => {
+    const { data } = await api.get<User>(`/admin/${userId}/user`);
+    return data;
+};

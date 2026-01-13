@@ -2,7 +2,7 @@ import { UserButton } from "@clerk/clerk-react";
 import { Link, useLocation } from "react-router-dom";
 import { useState } from "react";
 import logo from "../assets/logo.svg";
-import { Users, LayoutDashboard } from "lucide-react";
+import { Users, LayoutDashboard, Search } from "lucide-react";
 
 export default function Sidebar() {
     const location = useLocation();
@@ -44,6 +44,15 @@ export default function Sidebar() {
                     >
                         <Users size={20} />
                         <span>Users</span>
+                    </Link>
+
+                    <Link
+                        to="/lookup"
+                        className={`sidebar-nav-item ${isActive("/lookup") ? "active" : ""}`}
+                        onClick={() => setIsMobileOpen(false)}
+                    >
+                        <Search size={20} />
+                        <span>Lookup</span>
                     </Link>
 
                     {/* Add more admin links here later */}

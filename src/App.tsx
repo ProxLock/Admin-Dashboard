@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { api } from "./lib/api";
 import Sidebar from "./components/Sidebar";
 import UsersPage from "./pages/UsersPage";
+import LookupPage from "./pages/LookupPage";
 
 // Admin Guard Component
 function AdminGuard({ children }: { children: React.ReactNode }) {
@@ -63,6 +64,7 @@ function Layout() {
         <Routes>
           <Route path="/" element={<UsersPage />} />
           <Route path="/users" element={<UsersPage />} />
+          <Route path="/lookup" element={<LookupPage />} />
           <Route path="*" element={<div>Not Found</div>} />
         </Routes>
       </div>
