@@ -11,18 +11,27 @@ export default function UsersPage() {
     const [selectedUser, setSelectedUser] = useState<User | null>(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
 
-    const fetchUsers = async () => {
+    // Pagination state
+    const [page, setPage] = useState(1);
+    const [perPage] = useState(20);
+    const [totalPages, setTotalPages] = useState(1);
+
+    const fetchUsers = async (pageToFetch = 1) => {
         setLoading(true);
         try {
-            const res = await api.get('/admin/users');
-            // Assuming response is array or { users: [...] }
-            // Adjust based on actual API response structure. 
-            // The prompt says "To fetch all users, do /admin/users".
-            // I'll assume it returns an array of users directly or a wrapper.
-            if (Array.isArray(res.data)) {
-                setUsers(res.data);
-            } else if (res.data.users) {
+            const res = await api.get(`/admin/users?page=${pageToFetch}&per=${perPage}`);
+
+            if (res.data && Array.isArray(res.data.users)) {
                 setUsers(res.data.users);
+                if (res.data.metadata) {
+                    setTotalPages(res.data.metadata.pageCount);
+                    setPage(res.data.metadata.page);
+                }
+            } else if (Array.isArray(res.data)) {
+                // Fallback for non-paginated array response
+                setUsers(res.data);
+            } else {
+                setUsers([]);
             }
         } catch (err) {
             console.error("Failed to fetch users", err);
@@ -32,8 +41,8 @@ export default function UsersPage() {
     };
 
     useEffect(() => {
-        fetchUsers();
-    }, []);
+        fetchUsers(page);
+    }, [page]);
 
     const filteredUsers = users.filter(user => {
         const email = user.emailAddresses?.[0]?.emailAddress || '';
