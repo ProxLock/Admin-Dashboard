@@ -169,18 +169,20 @@ export default function UsersPage() {
             <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '1rem', marginTop: '1rem' }}>
                 <button
                     className="btn-solid"
-                    disabled={page <= 1 || loading}
+                    disabled={loading}
                     onClick={() => setPage(p => Math.max(1, p - 1))}
+                    style={{ visibility: page <= 1 ? 'hidden' : 'visible' }}
                 >
                     Previous
                 </button>
                 <span style={{ color: 'var(--text-secondary)' }}>
-                    Page {page} of {totalPages}
+                    Page {page}
                 </span>
                 <button
                     className="btn-solid"
-                    disabled={page >= totalPages || loading}
+                    disabled={loading}
                     onClick={() => setPage(p => p + 1)}
+                    style={{ visibility: (users.length < perPage || page >= totalPages) ? 'hidden' : 'visible' }}
                 >
                     Next
                 </button>
