@@ -1,4 +1,4 @@
-import { SignedIn, SignedOut, RedirectToSignIn, useAuth } from "@clerk/clerk-react";
+import { SignedIn, SignedOut, RedirectToSignIn, useAuth, useClerk } from "@clerk/clerk-react";
 import { Routes, Route } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { api } from "./lib/api";
@@ -9,6 +9,7 @@ import LookupPage from "./pages/LookupPage";
 // Admin Guard Component
 function AdminGuard({ children }: { children: React.ReactNode }) {
   const { getToken, isLoaded, isSignedIn } = useAuth();
+  const { signOut } = useClerk();
   const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -46,8 +47,26 @@ function AdminGuard({ children }: { children: React.ReactNode }) {
   if (isAdmin === false) {
     return (
       <div className="error-state">
-        <div className="error-message">
-          Unauthorized: You do not have admin access.
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', width: '100%', maxWidth: '500px' }}>
+          <div className="error-message" style={{ width: '100%', boxSizing: 'border-box' }}>
+            Unauthorized: You do not have admin access.
+          </div>
+          <button
+            onClick={() => signOut()}
+            style={{
+              alignSelf: 'flex-start',
+              padding: '0.5rem 1rem',
+              backgroundColor: 'var(--btn-secondary-bg)',
+              border: '1px solid var(--btn-secondary-border)',
+              color: 'var(--text-primary)',
+              borderRadius: '6px',
+              cursor: 'pointer',
+              fontSize: '0.9rem',
+              fontWeight: 500
+            }}
+          >
+            Sign Out
+          </button>
         </div>
       </div>
     );
