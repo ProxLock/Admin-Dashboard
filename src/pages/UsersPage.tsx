@@ -139,9 +139,13 @@ export default function UsersPage() {
                                     </td>
                                     <td style={{ padding: '12px 16px' }}>
                                         {user.overrideRequestLimit ? (
-                                            <span style={{ color: 'var(--accent-purple-1)', fontWeight: 500 }}>{user.overrideRequestLimit} (Override)</span>
+                                            <span style={{ color: 'var(--accent-purple-1)', fontWeight: 500 }}>
+                                                {user.overrideRequestLimit === -1 ? '∞' : user.overrideRequestLimit} (Override)
+                                            </span>
                                         ) : (
-                                            <span style={{ color: 'var(--text-muted)' }}>{user.requestLimit ?? 'Default'}</span>
+                                            <span style={{ color: 'var(--text-muted)' }}>
+                                                {user.requestLimit === -1 ? '∞' : (user.requestLimit ?? 'Default')}
+                                            </span>
                                         )}
                                     </td>
                                     <td style={{ padding: '12px 16px' }}>

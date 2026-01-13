@@ -11,6 +11,7 @@ export default function LookupPage() {
 
     // Override State
     const [overrideVal, setOverrideVal] = useState('');
+    const [isUnlimited, setIsUnlimited] = useState(false);
     const [updatingLimit, setUpdatingLimit] = useState(false);
 
     const handleSearch = async (e: React.FormEvent) => {
@@ -21,6 +22,7 @@ export default function LookupPage() {
         setError(null);
         setUserData(null);
         setOverrideVal(''); // Reset override input
+        setIsUnlimited(false);
 
         const url = `/admin/${userId}/user`;
 
@@ -28,10 +30,14 @@ export default function LookupPage() {
             const user = await lookupUser(userId);
             setUserData(user);
             // Initialize override input with current value if exists
-            if (user.overrideRequestLimit) {
-                setOverrideVal(user.overrideRequestLimit.toString());
-            } else if (user.requestLimit) {
-                setOverrideVal(user.requestLimit.toString());
+            const currentLimit = user.overrideRequestLimit ?? user.requestLimit;
+
+            if (currentLimit === -1) {
+                setIsUnlimited(true);
+                setOverrideVal('');
+            } else if (currentLimit !== undefined && currentLimit !== null) {
+                setOverrideVal(currentLimit.toString());
+                setIsUnlimited(false);
             }
 
         } catch (err: any) {
@@ -51,7 +57,13 @@ export default function LookupPage() {
         if (!userData) return;
         setUpdatingLimit(true);
         try {
-            const body = overrideVal === '' ? null : parseInt(overrideVal, 10);
+            let body: number | null = null;
+            if (isUnlimited) {
+                body = -1;
+            } else {
+                body = overrideVal === '' ? null : parseInt(overrideVal, 10);
+            }
+
             await api.post(`/admin/${userData.id}/user/override-limit`, body, {
                 headers: { 'Content-Type': 'application/json' }
             });
@@ -72,8 +84,8 @@ export default function LookupPage() {
             await api.post(`/admin/${userData.id}/user/override-limit`, null, {
                 headers: { 'Content-Type': 'application/json' }
             });
-            setOverrideVal(userData.requestLimit?.toString() || '');
-            // Refresh user data
+
+            // Re-initialize logic will run in handleSearch, but we can optimistically reset here or just refresh
             await handleSearch(null as any);
         } catch (err: any) {
             console.error("Failed to remove override", err);
@@ -202,6 +214,18 @@ export default function LookupPage() {
                                     {userData.currentRequestUsage ?? 0}
                                 </div>
                             </div>
+                            <div>
+                                <label style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: '0.25rem' }}>Request Limit</label>
+                                <div style={{ fontSize: '1.1rem', fontWeight: 500, color: 'var(--text-primary)' }}>
+                                    {userData.overrideRequestLimit ? (
+                                        <span style={{ color: 'var(--accent-purple-1)' }}>
+                                            {userData.overrideRequestLimit === -1 ? '∞' : userData.overrideRequestLimit} (Override)
+                                        </span>
+                                    ) : (
+                                        userData.requestLimit === -1 ? '∞' : (userData.requestLimit ?? 'Default')
+                                    )}
+                                </div>
+                            </div>
                         </div>
 
                         {/* Override Limit Section */}
@@ -219,22 +243,36 @@ export default function LookupPage() {
                                     <label style={{ display: 'block', fontSize: '0.9rem', color: 'var(--text-secondary)', marginBottom: '0.5rem' }}>
                                         Limit Value {userData.overrideRequestLimit ? '(Currently Overridden)' : '(Default)'}
                                     </label>
-                                    <div style={{ display: 'flex', gap: '0.5rem' }}>
+                                    <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
                                         <input
                                             type="number"
                                             value={overrideVal}
                                             onChange={(e) => setOverrideVal(e.target.value)}
-                                            placeholder="Enter limit"
+                                            placeholder={isUnlimited ? "Unlimited" : "Enter limit"}
+                                            disabled={isUnlimited}
                                             style={{
                                                 flex: 1,
                                                 padding: '8px 12px',
-                                                backgroundColor: 'var(--bg-input-focus)',
+                                                backgroundColor: isUnlimited ? 'var(--bg-card)' : 'var(--bg-input-focus)',
                                                 border: '1px solid var(--border-default)',
                                                 borderRadius: '6px',
                                                 color: 'var(--text-primary)',
-                                                fontSize: '1rem'
+                                                fontSize: '1rem',
+                                                opacity: isUnlimited ? 0.5 : 1
                                             }}
                                         />
+                                        <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.9rem', cursor: 'pointer', userSelect: 'none' }}>
+                                            <input
+                                                type="checkbox"
+                                                checked={isUnlimited}
+                                                onChange={(e) => {
+                                                    setIsUnlimited(e.target.checked);
+                                                    if (e.target.checked) setOverrideVal('');
+                                                }}
+                                                style={{ width: '16px', height: '16px' }}
+                                            />
+                                            <span style={{ color: 'var(--text-primary)' }}>Unlimited</span>
+                                        </label>
                                     </div>
                                     <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: '0.5rem' }}>
                                         Tier Default: {(() => {

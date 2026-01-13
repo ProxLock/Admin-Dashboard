@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { api } from '../lib/api';
 import type { User } from '../models';
 import { X } from 'lucide-react';
@@ -10,15 +10,36 @@ interface UserActionModalProps {
 }
 
 export default function UserActionModal({ isOpen, onClose, user }: UserActionModalProps) {
-    const [overrideLimit, setOverrideLimit] = useState((user.overrideRequestLimit ?? user.requestLimit)?.toString() || '');
+    const [overrideLimit, setOverrideLimit] = useState('');
+    const [isUnlimited, setIsUnlimited] = useState(false);
     const [updating, setUpdating] = useState(false);
+
+    // Initialize state when modal opens or user changes
+    useEffect(() => {
+        if (isOpen && user) {
+            const currentLimit = user.overrideRequestLimit ?? user.requestLimit;
+            if (currentLimit === -1) {
+                setIsUnlimited(true);
+                setOverrideLimit('');
+            } else {
+                setOverrideLimit((currentLimit ?? '').toString());
+                setIsUnlimited(false);
+            }
+        }
+    }, [isOpen, user]);
 
     if (!isOpen) return null;
 
     const handleSaveLimit = async () => {
         setUpdating(true);
         try {
-            const body = overrideLimit === '' ? null : parseInt(overrideLimit, 10);
+            let body: number | null = null;
+            if (isUnlimited) {
+                body = -1;
+            } else {
+                body = overrideLimit === '' ? null : parseInt(overrideLimit, 10);
+            }
+
             await api.post(`/admin/${user.id}/user/override-limit`, body, {
                 headers: { 'Content-Type': 'application/json' }
             });
@@ -69,21 +90,35 @@ export default function UserActionModal({ isOpen, onClose, user }: UserActionMod
                     <label style={{ display: 'block', marginBottom: '0.5rem', color: 'var(--text-secondary)', fontWeight: 500 }}>
                         Override Request Limit
                     </label>
-                    <div style={{ display: 'flex', gap: '10px' }}>
+                    <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
                         <input
                             type="number"
                             value={overrideLimit}
                             onChange={(e) => setOverrideLimit(e.target.value)}
-                            placeholder="Enter limit"
+                            placeholder={isUnlimited ? "Unlimited" : "Enter limit"}
+                            disabled={isUnlimited}
                             style={{
                                 flex: 1,
                                 padding: '8px 12px',
-                                backgroundColor: 'var(--bg-input)',
+                                backgroundColor: isUnlimited ? 'var(--bg-card)' : 'var(--bg-input)',
                                 border: '1px solid var(--border-default)',
                                 borderRadius: '6px',
-                                color: 'var(--text-primary)'
+                                color: 'var(--text-primary)',
+                                opacity: isUnlimited ? 0.5 : 1
                             }}
                         />
+                        <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.9rem', cursor: 'pointer', userSelect: 'none' }}>
+                            <input
+                                type="checkbox"
+                                checked={isUnlimited}
+                                onChange={(e) => {
+                                    setIsUnlimited(e.target.checked);
+                                    if (e.target.checked) setOverrideLimit('');
+                                }}
+                                style={{ width: '16px', height: '16px' }}
+                            />
+                            <span style={{ color: 'var(--text-primary)' }}>Unlimited</span>
+                        </label>
                     </div>
                 </div>
 
@@ -98,7 +133,9 @@ export default function UserActionModal({ isOpen, onClose, user }: UserActionMod
                         const defaultLimit = defaults[tier];
                         const currentLimit = user.requestLimit;
 
-                        if (user.overrideRequestLimit || (defaultLimit && currentLimit !== defaultLimit)) {
+                        // Show remove button if override exists (including -1) or if mismatch from default
+                        // Note: If user has override -1, user.overrideRequestLimit is -1, which is truthy-ish (non-zero number), so check strictly or existence
+                        if (user.overrideRequestLimit !== undefined && user.overrideRequestLimit !== null || (defaultLimit && currentLimit !== defaultLimit)) {
                             return (
                                 <button
                                     className="btn-solid"
