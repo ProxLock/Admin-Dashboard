@@ -2,7 +2,7 @@ import { UserButton } from "@clerk/clerk-react";
 import { Link, useLocation } from "react-router-dom";
 import { useState } from "react";
 import logo from "../assets/logo.svg";
-import { Users, LayoutDashboard, Search } from "lucide-react";
+import { Users, Search } from "lucide-react";
 
 export default function Sidebar() {
     const location = useLocation();
