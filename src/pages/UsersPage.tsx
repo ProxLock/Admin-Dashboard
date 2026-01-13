@@ -161,6 +161,27 @@ export default function UsersPage() {
                 )}
             </div>
 
+            {/* Pagination Controls */}
+            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '1rem', marginTop: '1rem' }}>
+                <button
+                    className="btn-solid"
+                    disabled={page <= 1 || loading}
+                    onClick={() => setPage(p => Math.max(1, p - 1))}
+                >
+                    Previous
+                </button>
+                <span style={{ color: 'var(--text-secondary)' }}>
+                    Page {page} of {totalPages}
+                </span>
+                <button
+                    className="btn-solid"
+                    disabled={page >= totalPages || loading}
+                    onClick={() => setPage(p => p + 1)}
+                >
+                    Next
+                </button>
+            </div>
+
             {selectedUser && (
                 <UserActionModal
                     isOpen={isModalOpen}
