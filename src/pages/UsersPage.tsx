@@ -107,8 +107,6 @@ export default function UsersPage() {
                         <thead style={{ borderBottom: '1px solid var(--border-default)', backgroundColor: 'var(--bg-card-hover)' }}>
                             <tr>
                                 <th style={{ padding: '12px 16px', color: 'var(--text-secondary)', fontWeight: 600 }}>User</th>
-                                <th style={{ padding: '12px 16px', color: 'var(--text-secondary)', fontWeight: 600 }}>Email</th>
-                                <th style={{ padding: '12px 16px', color: 'var(--text-secondary)', fontWeight: 600 }}>Created</th>
                                 <th style={{ padding: '12px 16px', color: 'var(--text-secondary)', fontWeight: 600 }}>Usage</th>
                                 <th style={{ padding: '12px 16px', color: 'var(--text-secondary)', fontWeight: 600 }}>Limit</th>
                                 <th style={{ padding: '12px 16px', color: 'var(--text-secondary)', fontWeight: 600 }}>Actions</th>
@@ -126,12 +124,6 @@ export default function UsersPage() {
                                             {/* Show ID if name is missing */}
                                             {(!user.firstName && !user.lastName) && <span style={{ color: 'var(--text-muted)', fontSize: '0.85em' }}>{user.id}</span>}
                                         </div>
-                                    </td>
-                                    <td style={{ padding: '12px 16px', color: 'var(--text-secondary)' }}>
-                                        {user.emailAddresses?.[0]?.emailAddress}
-                                    </td>
-                                    <td style={{ padding: '12px 16px', color: 'var(--text-muted)', fontSize: '0.9em' }}>
-                                        {new Date(user.createdAt).toLocaleDateString()}
                                     </td>
                                     <td style={{ padding: '12px 16px', color: 'var(--text-primary)' }}>
                                         {user.currentRequestUsage ?? 0}
