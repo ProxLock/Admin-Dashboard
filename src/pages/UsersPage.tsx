@@ -74,34 +74,20 @@ export default function UsersPage() {
                     </div>
                 </div>
 
-                <div className="search-bar-container" style={{ maxWidth: '400px', marginBottom: '1rem' }}>
-                    <div className="input-group">
-                        {/* Styles might need check, using standard input styles */}
-                        <div style={{ position: 'relative', width: '100%' }}>
-                            <Search size={18} style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)', opacity: 0.5 }} />
-                            <input
-                                type="text"
-                                placeholder="Search users..."
-                                value={searchTerm}
-                                onChange={(e) => setSearchTerm(e.target.value)}
-                                style={{
-                                    width: '100%',
-                                    paddingLeft: '36px',
-                                    paddingRight: '12px',
-                                    paddingTop: '8px',
-                                    paddingBottom: '8px',
-                                    backgroundColor: 'var(--bg-input)',
-                                    border: '1px solid var(--border-default)',
-                                    borderRadius: '6px',
-                                    color: 'var(--text-primary)'
-                                }}
-                            />
-                        </div>
-                    </div>
+                <div className="search-bar">
+                    <Search size={18} className="search-bar-icon" />
+                    <input
+                        type="text"
+                        className="search-bar-input"
+                        placeholder="Search users..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                    />
                 </div>
             </div>
 
-            <div className="card-surface" style={{ overflowX: 'auto', padding: 0 }}>
+            {/* Desktop Table View */}
+            <div className="card-surface users-table-desktop" style={{ overflowX: 'auto', padding: 0 }}>
                 {loading ? (
                     <div className="loading-state">
                         <div className="spinner"></div>
@@ -162,6 +148,62 @@ export default function UsersPage() {
                             ))}
                         </tbody>
                     </table>
+                )}
+            </div>
+
+            {/* Mobile Cards View */}
+            <div className="users-cards-mobile">
+                {loading ? (
+                    <div className="loading-state">
+                        <div className="spinner"></div>
+                        <p>Loading users...</p>
+                    </div>
+                ) : filteredUsers.length === 0 ? (
+                    <div className="empty-state">
+                        <p>No users found.</p>
+                    </div>
+                ) : (
+                    <div className="user-cards-list">
+                        {filteredUsers.map(user => (
+                            <div key={user.id} className="user-card">
+                                <div className="user-card-header">
+                                    <div className="user-card-avatar">
+                                        {user.imageUrl && <img src={user.imageUrl} alt="" />}
+                                    </div>
+                                    <div className="user-card-name">
+                                        {user.firstName || user.lastName ? (
+                                            <span>{user.firstName} {user.lastName}</span>
+                                        ) : (
+                                            <span className="user-card-id">{user.id}</span>
+                                        )}
+                                    </div>
+                                </div>
+                                <div className="user-card-stats">
+                                    <div className="user-card-stat">
+                                        <span className="stat-label">Usage</span>
+                                        <span className="stat-value">{user.currentRequestUsage ?? 0}</span>
+                                    </div>
+                                    <div className="user-card-stat">
+                                        <span className="stat-label">Limit</span>
+                                        <span className={`stat-value ${user.overrideRequestLimit ? 'override' : ''}`}>
+                                            {user.overrideRequestLimit ? (
+                                                <>{user.overrideRequestLimit === -1 ? '∞' : user.overrideRequestLimit} <small>(Override)</small></>
+                                            ) : (
+                                                user.requestLimit === -1 ? '∞' : (user.requestLimit ?? 'Default')
+                                            )}
+                                        </span>
+                                    </div>
+                                </div>
+                                <button
+                                    className="btn-solid user-card-edit"
+                                    onClick={() => handleEdit(user)}
+                                >
+                                    <Edit2 size={14} />
+                                    Edit User
+                                </button>
+                            </div>
+                        ))}
+                    </div>
                 )}
             </div>
 

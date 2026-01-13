@@ -4303,3 +4303,169 @@ body {
   font-size: 0.875rem;
   white-space: nowrap;
 }
+
+/* ===========================
+   Search Bar Component
+   =========================== */
+
+.search-bar {
+  position: relative;
+  max-width: 400px;
+  margin-bottom: 0.5rem;
+}
+
+.search-bar-icon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-muted);
+  pointer-events: none;
+  transition: color 0.2s ease;
+}
+
+.search-bar-input {
+  width: 100%;
+  padding: 10px 12px 10px 40px;
+  background-color: var(--bg-input);
+  border: 1px solid var(--border-default);
+  border-radius: 8px;
+  color: var(--text-primary);
+  font-size: 0.95rem;
+  transition: all 0.2s ease;
+  box-sizing: border-box;
+}
+
+.search-bar-input::placeholder {
+  color: var(--text-muted);
+}
+
+.search-bar-input:hover {
+  background-color: var(--bg-input-hover);
+  border-color: var(--border-hover);
+}
+
+.search-bar-input:focus {
+  outline: none;
+  background-color: var(--bg-input-focus);
+  border-color: var(--accent-purple-1);
+  box-shadow: 0 0 0 3px rgba(139, 107, 219, 0.15);
+}
+
+.search-bar:focus-within .search-bar-icon {
+  color: var(--accent-purple-1);
+}
+
+/* ===========================
+   Users Page - Responsive Cards
+   =========================== */
+
+/* Hide mobile cards by default, show on small screens */
+.users-cards-mobile {
+  display: none;
+}
+
+.users-table-desktop {
+  display: block;
+}
+
+@media (max-width: 768px) {
+  .users-table-desktop {
+    display: none;
+  }
+
+  .users-cards-mobile {
+    display: block;
+  }
+
+  .user-cards-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .user-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-default);
+    border-radius: 0.75rem;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .user-card-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .user-card-avatar img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+
+  .user-card-name {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    flex: 1;
+    word-break: break-word;
+  }
+
+  .user-card-id {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    font-weight: 400;
+  }
+
+  .user-card-stats {
+    display: flex;
+    gap: 1.5rem;
+    padding: 0.75rem;
+    background: var(--bg-card-hover);
+    border-radius: 0.5rem;
+  }
+
+  .user-card-stat {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .user-card-stat .stat-label {
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .user-card-stat .stat-value {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+
+  .user-card-stat .stat-value.override {
+    color: var(--accent-purple-1);
+  }
+
+  .user-card-stat .stat-value small {
+    font-size: 0.75rem;
+    font-weight: 500;
+    opacity: 0.8;
+  }
+
+  .user-card-edit {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.75rem;
+    margin-top: 0.25rem;
+  }
+}
