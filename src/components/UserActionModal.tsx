@@ -68,7 +68,6 @@ export default function UserActionModal({ isOpen, onClose, user }: UserActionMod
                 <div style={{ marginBottom: '1.5rem' }}>
                     <h3 style={{ fontSize: '1.1rem', marginBottom: '0.5rem', color: 'var(--text-secondary)' }}>Details</h3>
                     <p style={{ color: 'var(--text-muted)' }}>ID: {user.id}</p>
-                    <p style={{ color: 'var(--text-muted)' }}>Email: {user.emailAddresses?.[0]?.emailAddress}</p>
                 </div>
 
                 <div style={{ marginBottom: '2rem' }}>
