@@ -111,40 +111,46 @@ export default function LookupPage() {
                     <label style={{ display: 'block', marginBottom: '0.75rem', color: 'var(--text-secondary)', fontWeight: 500 }}>
                         Search by User ID
                     </label>
-                    <div className="input-group" style={{ display: 'flex', gap: '1rem' }}>
-                        <div style={{ position: 'relative', flex: 1 }}>
-                            <Search size={18} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', opacity: 0.5, color: 'var(--text-primary)' }} />
-                            <input
-                                type="text"
-                                placeholder="e.g. user_2..."
-                                value={userId}
-                                onChange={(e) => setUserId(e.target.value)}
-                                style={{
-                                    width: '100%',
-                                    paddingLeft: '40px',
-                                    paddingRight: '12px',
-                                    paddingTop: '10px',
-                                    paddingBottom: '10px',
-                                    backgroundColor: 'var(--bg-input)',
-                                    border: '1px solid var(--border-default)',
-                                    borderRadius: '8px',
-                                    color: 'var(--text-primary)',
-                                    fontSize: '1rem'
-                                }}
-                            />
-                        </div>
+                    <div style={{ position: 'relative', width: '100%' }}>
+                        <Search size={18} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', opacity: 0.5, color: 'var(--text-primary)' }} />
+                        <input
+                            type="text"
+                            placeholder="e.g. user_2..."
+                            value={userId}
+                            onChange={(e) => setUserId(e.target.value)}
+                            style={{
+                                width: '100%',
+                                paddingLeft: '40px',
+                                paddingRight: '120px', // Space for the button
+                                paddingTop: '12px',
+                                paddingBottom: '12px',
+                                backgroundColor: 'var(--bg-input)',
+                                border: '1px solid var(--border-default)',
+                                borderRadius: '8px',
+                                color: 'var(--text-primary)',
+                                fontSize: '1rem',
+                                boxSizing: 'border-box'
+                            }}
+                        />
                         <button
                             type="submit"
                             className="btn-solid"
                             disabled={loading}
                             style={{
+                                position: 'absolute',
+                                right: '6px',
+                                top: '50%',
+                                transform: 'translateY(-50%)',
                                 backgroundColor: 'var(--accent-purple-1)',
                                 color: 'white',
                                 borderColor: 'var(--accent-purple-1)',
-                                padding: '0 1.5rem'
+                                padding: '6px 16px',
+                                fontSize: '0.9rem',
+                                height: 'auto',
+                                minHeight: 'unset'
                             }}
                         >
-                            {loading ? 'Searching...' : 'Search'}
+                            {loading ? '...' : 'Search'}
                         </button>
                     </div>
                 </form>
