@@ -4357,6 +4357,352 @@ body {
 }
 
 /* ===========================
+   Lookup Page Styles
+   =========================== */
+
+.lookup-subtext {
+  margin: 0;
+  text-align: left;
+  max-width: 600px;
+  color: var(--text-muted);
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+.lookup-card {
+  max-width: 800px;
+  margin: 0 auto;
+  width: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.lookup-form {
+  margin-bottom: 2rem;
+}
+
+.lookup-label {
+  display: block;
+  margin-bottom: 0.75rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.lookup-search-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  width: 100%;
+}
+
+.lookup-search-row {
+  position: relative;
+  width: 100%;
+}
+
+.lookup-search-icon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-muted);
+  pointer-events: none;
+}
+
+.lookup-search-input {
+  width: 100%;
+  max-width: 100%;
+  padding: 12px 12px 12px 40px;
+  background-color: var(--bg-input);
+  border: 1px solid var(--border-default);
+  border-radius: 8px;
+  color: var(--text-primary);
+  font-size: 1rem;
+  box-sizing: border-box;
+  transition: all 0.2s ease;
+}
+
+.lookup-search-input:hover {
+  background-color: var(--bg-input-hover);
+  border-color: var(--border-hover);
+}
+
+.lookup-search-input:focus {
+  outline: none;
+  background-color: var(--bg-input-focus);
+  border-color: var(--accent-purple-1);
+  box-shadow: 0 0 0 3px rgba(139, 107, 219, 0.15);
+}
+
+.lookup-search-btn {
+  width: 100%;
+  padding: 10px 16px;
+  font-size: 0.95rem;
+}
+
+/* Primary Button Style */
+.btn-primary {
+  background-color: var(--accent-purple-1);
+  color: #fff;
+  border: 1px solid var(--accent-purple-1);
+  font-size: 0.95rem;
+  font-weight: 500;
+  padding: 0.6rem 1rem;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: all 0.15s ease-in-out;
+}
+
+.btn-primary:hover {
+  background-color: var(--accent-purple-2);
+  border-color: var(--accent-purple-2);
+}
+
+.btn-primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Danger Button Style */
+.btn-danger {
+  background-color: rgba(220, 38, 38, 0.1);
+  color: var(--color-error);
+  border-color: var(--color-error-border);
+}
+
+.btn-danger:hover {
+  background-color: rgba(220, 38, 38, 0.2);
+}
+
+/* Lookup Error */
+.lookup-error {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 1.25rem;
+  background: var(--color-error-bg);
+  border: 1px solid var(--color-error-border);
+  border-radius: 0.75rem;
+  margin-bottom: 2rem;
+  color: var(--color-error);
+}
+
+.lookup-error-title {
+  font-weight: 600;
+}
+
+.lookup-error-url {
+  font-size: 0.85rem;
+  opacity: 0.8;
+}
+
+.lookup-error-details {
+  margin-top: 0.5rem;
+}
+
+.lookup-error-details summary {
+  cursor: pointer;
+  opacity: 0.8;
+}
+
+.lookup-error-pre {
+  margin-top: 0.5rem;
+  background: rgba(0, 0, 0, 0.2);
+  padding: 1rem;
+  border-radius: 6px;
+  overflow: auto;
+  font-size: 0.8rem;
+}
+
+/* Lookup Result */
+.lookup-result {
+  animation: fadeIn 0.3s ease;
+}
+
+.lookup-user-header {
+  margin-bottom: 1.5rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.lookup-user-name {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 0.25rem 0;
+}
+
+.lookup-user-id {
+  color: var(--text-secondary);
+  font-family: monospace;
+}
+
+.lookup-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.lookup-stat-label {
+  display: block;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-bottom: 0.25rem;
+}
+
+.lookup-stat-value {
+  color: var(--text-primary);
+}
+
+.lookup-stat-value-lg {
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.lookup-badge {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  background-color: var(--badge-bg);
+  border: 1px solid var(--badge-border);
+  color: var(--accent-purple-1);
+  border-radius: 4px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  text-transform: capitalize;
+}
+
+.lookup-override {
+  color: var(--accent-purple-1);
+}
+
+/* Config Section */
+.lookup-config-section {
+  margin-bottom: 2rem;
+  padding: 1.5rem;
+  background-color: var(--bg-input);
+  border-radius: 8px;
+  border: 1px solid var(--border-default);
+}
+
+.lookup-config-title {
+  font-size: 1.1rem;
+  margin: 0 0 1rem 0;
+  color: var(--text-primary);
+}
+
+.lookup-config-grid {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 1rem;
+  align-items: end;
+}
+
+.lookup-config-label {
+  display: block;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin-bottom: 0.5rem;
+}
+
+.lookup-config-input-row {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.lookup-config-input {
+  flex: 1;
+  padding: 8px 12px;
+  background-color: var(--bg-input-focus);
+  border: 1px solid var(--border-default);
+  border-radius: 6px;
+  color: var(--text-primary);
+  font-size: 1rem;
+  transition: all 0.2s ease;
+}
+
+.lookup-config-input.disabled {
+  background-color: var(--bg-card);
+  opacity: 0.5;
+}
+
+.lookup-checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  user-select: none;
+  color: var(--text-primary);
+}
+
+.lookup-checkbox-label input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+}
+
+.lookup-tier-hint {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-top: 0.5rem;
+}
+
+.lookup-config-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+/* Raw Data */
+.lookup-raw-data {
+  margin-top: 1rem;
+}
+
+.lookup-raw-data summary {
+  cursor: pointer;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+.lookup-raw-data pre {
+  margin-top: 1rem;
+  background-color: var(--bg-code);
+  padding: 1rem;
+  border-radius: 8px;
+  overflow: auto;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Responsive for Lookup page */
+@media (max-width: 640px) {
+  .lookup-config-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .lookup-config-actions {
+    flex-direction: column;
+  }
+
+  .lookup-config-actions button {
+    width: 100%;
+  }
+}
+
+/* ===========================
    Users Page - Responsive Cards
    =========================== */
 
