@@ -52,11 +52,11 @@ export default function Sidebar() {
 
                 <div className="sidebar-bottom">
                     <div className="sidebar-user-button">
-                        <UserButton showName={true} />
+                        <UserButton showName={false} />
                     </div>
 
                     <div className="sidebar-footer">
-                        <p className="sidebar-footer-text">ProxLock Admin</p>
+                        <p className="sidebar-footer-text">© 2026 PROXLOCK</p>
                     </div>
                 </div>
             </aside>
