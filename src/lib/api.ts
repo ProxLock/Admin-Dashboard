@@ -4,11 +4,19 @@ export const api = axios.create({
     baseURL: import.meta.env.VITE_API_URL || 'http://localhost:8080',
 });
 
-// Helper to set token
-export const setAuthToken = (token: string | null) => {
-    if (token) {
-        api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-    } else {
-        delete api.defaults.headers.common['Authorization'];
+// Add a request interceptor to attach the Clerk token dynamically
+api.interceptors.request.use(async (config) => {
+    try {
+        // @ts-ignore - Clerk is exposed globally by the Clerk Provider script
+        const token = await window.Clerk?.session?.getToken({ template: "default" });
+        if (token) {
+            config.headers.Authorization = `Bearer ${token}`;
+        }
+    } catch (error) {
+        console.error("Error fetching Clerk token", error);
     }
-};
+    return config;
+}, (error) => {
+    return Promise.reject(error);
+});
+

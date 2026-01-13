@@ -1,7 +1,7 @@
 import { SignedIn, SignedOut, RedirectToSignIn, useAuth } from "@clerk/clerk-react";
 import { Routes, Route } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { api, setAuthToken } from "./lib/api";
+import { api } from "./lib/api";
 import Sidebar from "./components/Sidebar";
 import UsersPage from "./pages/UsersPage";
 
@@ -16,9 +16,7 @@ function AdminGuard({ children }: { children: React.ReactNode }) {
       if (!isLoaded || !isSignedIn) return;
 
       try {
-        const token = await getToken({ template: "default" });
-        setAuthToken(token);
-
+        // Token is now handled by interceptor in api.ts
         const res = await api.get('/me');
         if (res.data.isAdmin) {
           setIsAdmin(true);
