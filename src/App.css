@@ -2680,6 +2680,7 @@ body {
 
 /* Sidebar Mobile Toggle */
 .sidebar-mobile-toggle {
+  padding: 0;
   display: none;
   position: fixed;
   top: 1.5rem;
