@@ -88,14 +88,30 @@ export default function UserActionModal({ isOpen, onClose, user }: UserActionMod
                 </div>
 
                 <div className="actions-row" style={{ justifyContent: 'flex-end', marginTop: '2rem' }}>
-                    <button
-                        className="btn-solid"
-                        onClick={handleRemoveOverride}
-                        disabled={updating}
-                        style={{ marginRight: 'auto', backgroundColor: 'var(--btn-secondary-bg)', borderColor: 'var(--btn-secondary-border)', color: 'var(--color-error)' }}
-                    >
-                        Remove Override
-                    </button>
+                    {(() => {
+                        const tier = user.currentSubscription || 'free_user';
+                        const defaults: Record<string, number> = {
+                            'free_user': 3000,
+                            '10k_requests': 10000,
+                            'pro': 25000
+                        };
+                        const defaultLimit = defaults[tier];
+                        const currentLimit = user.requestLimit;
+
+                        if (user.overrideRequestLimit || (defaultLimit && currentLimit !== defaultLimit)) {
+                            return (
+                                <button
+                                    className="btn-solid"
+                                    onClick={handleRemoveOverride}
+                                    disabled={updating}
+                                    style={{ marginRight: 'auto', backgroundColor: 'var(--btn-secondary-bg)', borderColor: 'var(--btn-secondary-border)', color: 'var(--color-error)' }}
+                                >
+                                    Remove Override
+                                </button>
+                            );
+                        }
+                        return null;
+                    })()}
 
                     <button
                         className="btn-solid"
