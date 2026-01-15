@@ -157,10 +157,6 @@ export default function LookupPage() {
 
                         <div className="lookup-stats-grid">
                             <div className="lookup-stat">
-                                <label className="lookup-stat-label">Email</label>
-                                <div className="lookup-stat-value">{userData.emailAddresses?.[0]?.emailAddress || 'N/A'}</div>
-                            </div>
-                            <div className="lookup-stat">
                                 <label className="lookup-stat-label">Full Subscription</label>
                                 <span className="lookup-badge">
                                     {userData.currentSubscription || 'Free'}
