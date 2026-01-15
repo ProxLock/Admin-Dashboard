@@ -9,10 +9,15 @@ export default function LookupPage() {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<any>(null); // Changed to any to store full error info
 
-    // Override State
+    // Request Limit Override State
     const [overrideVal, setOverrideVal] = useState('');
     const [isUnlimited, setIsUnlimited] = useState(false);
     const [updatingLimit, setUpdatingLimit] = useState(false);
+
+    // Access Key Limit Override State
+    const [accessKeyOverrideVal, setAccessKeyOverrideVal] = useState('');
+    const [isAccessKeyUnlimited, setIsAccessKeyUnlimited] = useState(false);
+    const [updatingAccessKeyLimit, setUpdatingAccessKeyLimit] = useState(false);
 
     const handleSearch = async (e: React.FormEvent) => {
         e?.preventDefault();
@@ -23,6 +28,8 @@ export default function LookupPage() {
         setUserData(null);
         setOverrideVal(''); // Reset override input
         setIsUnlimited(false);
+        setAccessKeyOverrideVal(''); // Reset access key override input
+        setIsAccessKeyUnlimited(false);
 
         const url = `/admin/${userId}/user`;
 
@@ -38,6 +45,17 @@ export default function LookupPage() {
             } else if (currentLimit !== undefined && currentLimit !== null) {
                 setOverrideVal(currentLimit.toString());
                 setIsUnlimited(false);
+            }
+
+            // Initialize access key override input
+            const currentAccessKeyLimit = user.overrideAccessKeyLimit ?? user.accessKeyLimit;
+
+            if (currentAccessKeyLimit === -1) {
+                setIsAccessKeyUnlimited(true);
+                setAccessKeyOverrideVal('');
+            } else if (currentAccessKeyLimit !== undefined && currentAccessKeyLimit !== null) {
+                setAccessKeyOverrideVal(currentAccessKeyLimit.toString());
+                setIsAccessKeyUnlimited(false);
             }
 
         } catch (err: any) {
@@ -92,6 +110,47 @@ export default function LookupPage() {
             alert("Failed to remove override: " + (err.message || "Unknown error"));
         } finally {
             setUpdatingLimit(false);
+        }
+    };
+
+    const handleSaveAccessKeyLimit = async () => {
+        if (!userData) return;
+        setUpdatingAccessKeyLimit(true);
+        try {
+            let body: number | null = null;
+            if (isAccessKeyUnlimited) {
+                body = -1;
+            } else {
+                body = accessKeyOverrideVal === '' ? null : parseInt(accessKeyOverrideVal, 10);
+            }
+
+            await api.post(`/admin/${userData.id}/user/api-keys/override-limit`, body, {
+                headers: { 'Content-Type': 'application/json' }
+            });
+            // Refresh user data
+            await handleSearch(null as any);
+        } catch (err: any) {
+            console.error("Failed to update access key limit", err);
+            alert("Failed to update access key limit: " + (err.message || "Unknown error"));
+        } finally {
+            setUpdatingAccessKeyLimit(false);
+        }
+    };
+
+    const handleRemoveAccessKeyOverride = async () => {
+        if (!userData) return;
+        setUpdatingAccessKeyLimit(true);
+        try {
+            await api.post(`/admin/${userData.id}/user/api-keys/override-limit`, null, {
+                headers: { 'Content-Type': 'application/json' }
+            });
+
+            await handleSearch(null as any);
+        } catch (err: any) {
+            console.error("Failed to remove access key override", err);
+            alert("Failed to remove access key override: " + (err.message || "Unknown error"));
+        } finally {
+            setUpdatingAccessKeyLimit(false);
         }
     };
 
@@ -178,6 +237,22 @@ export default function LookupPage() {
                                     )}
                                 </div>
                             </div>
+                            <div className="lookup-stat">
+                                <label className="lookup-stat-label">Access Keys</label>
+                                <div className="lookup-stat-value-lg">{userData.accessKeys?.length ?? 0}</div>
+                            </div>
+                            <div className="lookup-stat">
+                                <label className="lookup-stat-label">Access Key Limit</label>
+                                <div className="lookup-stat-value-lg">
+                                    {userData.overrideAccessKeyLimit ? (
+                                        <span className="lookup-override">
+                                            {userData.overrideAccessKeyLimit === -1 ? '∞' : userData.overrideAccessKeyLimit} (Override)
+                                        </span>
+                                    ) : (
+                                        userData.accessKeyLimit === -1 ? '∞' : (userData.accessKeyLimit ?? 'Default')
+                                    )}
+                                </div>
+                            </div>
                         </div>
 
                         {/* Override Limit Section */}
@@ -238,6 +313,69 @@ export default function LookupPage() {
                                         disabled={updatingLimit}
                                     >
                                         {updatingLimit ? 'Saving...' : 'Set Limit'}
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Access Key Limit Override Section */}
+                        <div className="lookup-config-section">
+                            <h3 className="lookup-config-title">Access Key Limit Configuration</h3>
+
+                            <div className="lookup-config-grid">
+                                <div>
+                                    <label className="lookup-config-label">
+                                        Limit Value {userData.overrideAccessKeyLimit ? '(Currently Overridden)' : '(Default)'}
+                                    </label>
+                                    <div className="lookup-config-input-row">
+                                        <input
+                                            type="number"
+                                            className={`lookup-config-input ${isAccessKeyUnlimited ? 'disabled' : ''}`}
+                                            value={accessKeyOverrideVal}
+                                            onChange={(e) => setAccessKeyOverrideVal(e.target.value)}
+                                            placeholder={isAccessKeyUnlimited ? "Unlimited" : "Enter limit"}
+                                            disabled={isAccessKeyUnlimited}
+                                        />
+                                        <label className="lookup-checkbox-label">
+                                            <input
+                                                type="checkbox"
+                                                checked={isAccessKeyUnlimited}
+                                                onChange={(e) => {
+                                                    setIsAccessKeyUnlimited(e.target.checked);
+                                                    if (e.target.checked) setAccessKeyOverrideVal('');
+                                                }}
+                                            />
+                                            <span>Unlimited</span>
+                                        </label>
+                                    </div>
+                                    <div className="lookup-tier-hint">
+                                        Tier Default: {(() => {
+                                            const tier = userData.currentSubscription || 'free_user';
+                                            const defaults: Record<string, number> = {
+                                                'free_user': 0,
+                                                '10k_requests': 1,
+                                                'pro': 5
+                                            };
+                                            return defaults[tier] !== undefined ? `${defaults[tier]}` : 'Unknown';
+                                        })()}
+                                    </div>
+                                </div>
+                                <div className="lookup-config-actions">
+                                    {userData.overrideAccessKeyLimit && (
+                                        <button
+                                            className="btn-solid btn-danger"
+                                            onClick={handleRemoveAccessKeyOverride}
+                                            disabled={updatingAccessKeyLimit}
+                                        >
+                                            Remove Override
+                                        </button>
+                                    )}
+                                    <button
+                                        className="btn-primary"
+                                        onClick={handleSaveAccessKeyLimit}
+                                        disabled={updatingAccessKeyLimit}
+                                    >
+                                        {updatingAccessKeyLimit ? 'Saving...' : 'Set Limit'}
                                     </button>
                                 </div>
                             </div>

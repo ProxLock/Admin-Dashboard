@@ -24,6 +24,11 @@ export interface PageMetadata {
     pageCount: number;
 }
 
+export interface AccessKey {
+    name: string | null;
+    key: string | null;
+}
+
 export interface UserDTO {
     id: string;
     projects?: ProjectDTO[];
@@ -38,6 +43,10 @@ export interface UserDTO {
     emailAddresses?: { emailAddress: string }[];
     imageUrl?: string;
     overrideRequestLimit?: number | null;
+    // Access Keys
+    accessKeys?: AccessKey[];
+    accessKeyLimit?: number;
+    overrideAccessKeyLimit?: number | null;
 }
 
 export interface PaginatedUsersDTO {
