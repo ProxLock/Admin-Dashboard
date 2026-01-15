@@ -10,13 +10,19 @@ interface UserActionModalProps {
 }
 
 export default function UserActionModal({ isOpen, onClose, user }: UserActionModalProps) {
+    // Request Limit Override State
     const [overrideLimit, setOverrideLimit] = useState('');
     const [isUnlimited, setIsUnlimited] = useState(false);
     const [updating, setUpdating] = useState(false);
 
+    // Access Key Limit Override State
+    const [accessKeyLimit, setAccessKeyLimit] = useState('');
+    const [isAccessKeyUnlimited, setIsAccessKeyUnlimited] = useState(false);
+
     // Initialize state when modal opens or user changes
     useEffect(() => {
         if (isOpen && user) {
+            // Request Limit
             const currentLimit = user.overrideRequestLimit ?? user.requestLimit;
             if (currentLimit === -1) {
                 setIsUnlimited(true);
@@ -25,34 +31,74 @@ export default function UserActionModal({ isOpen, onClose, user }: UserActionMod
                 setOverrideLimit((currentLimit ?? '').toString());
                 setIsUnlimited(false);
             }
+
+            // Access Key Limit
+            const currentAccessKeyLimit = user.overrideAccessKeyLimit ?? user.accessKeyLimit;
+            if (currentAccessKeyLimit === -1) {
+                setIsAccessKeyUnlimited(true);
+                setAccessKeyLimit('');
+            } else {
+                setAccessKeyLimit((currentAccessKeyLimit ?? '').toString());
+                setIsAccessKeyUnlimited(false);
+            }
         }
     }, [isOpen, user]);
 
     if (!isOpen) return null;
 
-    const handleSaveLimit = async () => {
+    const handleSaveAll = async () => {
         setUpdating(true);
         try {
-            let body: number | null = null;
+            // Save Request Limit
+            let requestBody: number | null = null;
             if (isUnlimited) {
-                body = -1;
+                requestBody = -1;
             } else {
-                body = overrideLimit === '' ? null : parseInt(overrideLimit, 10);
+                requestBody = overrideLimit === '' ? null : parseInt(overrideLimit, 10);
             }
 
-            await api.post(`/admin/${user.id}/user/override-limit`, body, {
-                headers: { 'Content-Type': 'application/json' }
-            });
+            // Save Access Key Limit
+            let accessKeyBody: number | null = null;
+            if (isAccessKeyUnlimited) {
+                accessKeyBody = -1;
+            } else {
+                accessKeyBody = accessKeyLimit === '' ? null : parseInt(accessKeyLimit, 10);
+            }
+
+            await Promise.all([
+                api.post(`/admin/${user.id}/user/override-limit`, requestBody, {
+                    headers: { 'Content-Type': 'application/json' }
+                }),
+                api.post(`/admin/${user.id}/user/api-keys/override-limit`, accessKeyBody, {
+                    headers: { 'Content-Type': 'application/json' }
+                })
+            ]);
+
             onClose(true); // Close and refresh
         } catch (err) {
-            console.error("Failed to update limit", err);
-            alert("Failed to update limit");
+            console.error("Failed to update limits", err);
+            alert("Failed to update limits");
         } finally {
             setUpdating(false);
         }
     };
 
-    const handleRemoveOverride = async () => {
+    const handleRemoveAccessKeyOverride = async () => {
+        setUpdating(true);
+        try {
+            await api.post(`/admin/${user.id}/user/api-keys/override-limit`, null, {
+                headers: { 'Content-Type': 'application/json' }
+            });
+            onClose(true);
+        } catch (err) {
+            console.error("Failed to remove access key override", err);
+            alert("Failed to remove access key override");
+        } finally {
+            setUpdating(false);
+        }
+    };
+
+    const handleRemoveRequestOverride = async () => {
         setUpdating(true);
         try {
             await api.post(`/admin/${user.id}/user/override-limit`, null, {
@@ -60,8 +106,8 @@ export default function UserActionModal({ isOpen, onClose, user }: UserActionMod
             });
             onClose(true);
         } catch (err) {
-            console.error("Failed to remove override limit", err);
-            alert("Failed to remove override limit");
+            console.error("Failed to remove request override", err);
+            alert("Failed to remove request override");
         } finally {
             setUpdating(false);
         }
@@ -86,9 +132,18 @@ export default function UserActionModal({ isOpen, onClose, user }: UserActionMod
                     <p style={{ color: 'var(--text-muted)' }}>ID: {user.id}</p>
                 </div>
 
-                <div style={{ marginBottom: '2rem' }}>
+                <div style={{ marginBottom: '1.5rem' }}>
                     <label style={{ display: 'block', marginBottom: '0.5rem', color: 'var(--text-secondary)', fontWeight: 500 }}>
                         Override Request Limit
+                        {user.overrideRequestLimit !== undefined && user.overrideRequestLimit !== null && (
+                            <button
+                                onClick={handleRemoveRequestOverride}
+                                disabled={updating}
+                                style={{ marginLeft: '10px', background: 'transparent', border: 'none', color: 'var(--color-error)', cursor: 'pointer', fontSize: '0.85rem', textDecoration: 'underline' }}
+                            >
+                                Remove Override
+                            </button>
+                        )}
                     </label>
                     <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
                         <input
@@ -122,34 +177,53 @@ export default function UserActionModal({ isOpen, onClose, user }: UserActionMod
                     </div>
                 </div>
 
+                {/* Access Key Limit Section */}
+                <div style={{ marginBottom: '1.5rem' }}>
+                    <label style={{ display: 'block', marginBottom: '0.5rem', color: 'var(--text-secondary)', fontWeight: 500 }}>
+                        Override Access Key Limit
+                        {user.overrideAccessKeyLimit !== undefined && user.overrideAccessKeyLimit !== null && (
+                            <button
+                                onClick={handleRemoveAccessKeyOverride}
+                                disabled={updating}
+                                style={{ marginLeft: '10px', background: 'transparent', border: 'none', color: 'var(--color-error)', cursor: 'pointer', fontSize: '0.85rem', textDecoration: 'underline' }}
+                            >
+                                Remove Override
+                            </button>
+                        )}
+                    </label>
+                    <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+                        <input
+                            type="number"
+                            value={accessKeyLimit}
+                            onChange={(e) => setAccessKeyLimit(e.target.value)}
+                            placeholder={isAccessKeyUnlimited ? "Unlimited" : "Enter limit"}
+                            disabled={isAccessKeyUnlimited}
+                            style={{
+                                flex: 1,
+                                padding: '8px 12px',
+                                backgroundColor: isAccessKeyUnlimited ? 'var(--bg-card)' : 'var(--bg-input)',
+                                border: '1px solid var(--border-default)',
+                                borderRadius: '6px',
+                                color: 'var(--text-primary)',
+                                opacity: isAccessKeyUnlimited ? 0.5 : 1
+                            }}
+                        />
+                        <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.9rem', cursor: 'pointer', userSelect: 'none' }}>
+                            <input
+                                type="checkbox"
+                                checked={isAccessKeyUnlimited}
+                                onChange={(e) => {
+                                    setIsAccessKeyUnlimited(e.target.checked);
+                                    if (e.target.checked) setAccessKeyLimit('');
+                                }}
+                                style={{ width: '16px', height: '16px' }}
+                            />
+                            <span style={{ color: 'var(--text-primary)' }}>Unlimited</span>
+                        </label>
+                    </div>
+                </div>
+
                 <div className="actions-row" style={{ justifyContent: 'flex-end', marginTop: '2rem' }}>
-                    {(() => {
-                        const tier = user.currentSubscription || 'free_user';
-                        const defaults: Record<string, number> = {
-                            'free_user': 3000,
-                            '10k_requests': 10000,
-                            'pro': 25000
-                        };
-                        const defaultLimit = defaults[tier];
-                        const currentLimit = user.requestLimit;
-
-                        // Show remove button if override exists (including -1) or if mismatch from default
-                        // Note: If user has override -1, user.overrideRequestLimit is -1, which is truthy-ish (non-zero number), so check strictly or existence
-                        if (user.overrideRequestLimit !== undefined && user.overrideRequestLimit !== null || (defaultLimit && currentLimit !== defaultLimit)) {
-                            return (
-                                <button
-                                    className="btn-solid"
-                                    onClick={handleRemoveOverride}
-                                    disabled={updating}
-                                    style={{ marginRight: 'auto', backgroundColor: 'var(--btn-secondary-bg)', borderColor: 'var(--btn-secondary-border)', color: 'var(--color-error)' }}
-                                >
-                                    Remove Override
-                                </button>
-                            );
-                        }
-                        return null;
-                    })()}
-
                     <button
                         className="btn-solid"
                         onClick={() => onClose()}
@@ -160,11 +234,11 @@ export default function UserActionModal({ isOpen, onClose, user }: UserActionMod
                     </button>
                     <button
                         className="btn-solid"
-                        onClick={handleSaveLimit}
+                        onClick={handleSaveAll}
                         disabled={updating}
                         style={{ backgroundColor: 'var(--accent-purple-1)', color: '#fff', borderColor: 'var(--accent-purple-1)' }}
                     >
-                        {updating ? 'Saving...' : 'Save Limit'}
+                        {updating ? 'Saving...' : 'Save All'}
                     </button>
                 </div>
             </div>
