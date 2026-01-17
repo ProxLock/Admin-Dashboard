@@ -102,8 +102,8 @@ export default function UsersPage() {
                         <thead style={{ borderBottom: '1px solid var(--border-default)', backgroundColor: 'var(--bg-card-hover)' }}>
                             <tr>
                                 <th style={{ padding: '12px 16px', color: 'var(--text-secondary)', fontWeight: 600 }}>User</th>
-                                <th style={{ padding: '12px 16px', color: 'var(--text-secondary)', fontWeight: 600 }}>Usage</th>
-                                <th style={{ padding: '12px 16px', color: 'var(--text-secondary)', fontWeight: 600 }}>Limit</th>
+                                <th style={{ padding: '12px 16px', color: 'var(--text-secondary)', fontWeight: 600 }}>Requests</th>
+                                <th style={{ padding: '12px 16px', color: 'var(--text-secondary)', fontWeight: 600 }}>Access Keys</th>
                                 <th style={{ padding: '12px 16px', color: 'var(--text-secondary)', fontWeight: 600 }}>Actions</th>
                             </tr>
                         </thead>
@@ -120,19 +120,33 @@ export default function UsersPage() {
                                             {(!user.firstName && !user.lastName) && <span style={{ color: 'var(--text-muted)', fontSize: '0.85em' }}>{user.id}</span>}
                                         </div>
                                     </td>
-                                    <td style={{ padding: '12px 16px', color: 'var(--text-primary)' }}>
-                                        {user.currentRequestUsage ?? 0}
+                                    <td style={{ padding: '12px 16px' }}>
+                                        <span style={{ color: 'var(--text-primary)' }}>
+                                            {user.currentRequestUsage ?? 0}
+                                        </span>
+                                        <span style={{ color: 'var(--text-muted)', marginLeft: '4px' }}>
+                                            / {user.overrideRequestLimit !== undefined && user.overrideRequestLimit !== null ? (
+                                                <span style={{ color: 'var(--accent-purple-1)' }}>
+                                                    {user.overrideRequestLimit === -1 ? '∞' : user.overrideRequestLimit}
+                                                </span>
+                                            ) : (
+                                                user.requestLimit === -1 ? '∞' : (user.requestLimit ?? 'Default')
+                                            )}
+                                        </span>
                                     </td>
                                     <td style={{ padding: '12px 16px' }}>
-                                        {user.overrideRequestLimit ? (
-                                            <span style={{ color: 'var(--accent-purple-1)', fontWeight: 500 }}>
-                                                {user.overrideRequestLimit === -1 ? '∞' : user.overrideRequestLimit} (Override)
-                                            </span>
-                                        ) : (
-                                            <span style={{ color: 'var(--text-muted)' }}>
-                                                {user.requestLimit === -1 ? '∞' : (user.requestLimit ?? 'Default')}
-                                            </span>
-                                        )}
+                                        <span style={{ color: 'var(--text-primary)' }}>
+                                            {user.accessKeys?.length ?? 0}
+                                        </span>
+                                        <span style={{ color: 'var(--text-muted)', marginLeft: '4px' }}>
+                                            / {user.overrideAccessKeyLimit !== undefined && user.overrideAccessKeyLimit !== null ? (
+                                                <span style={{ color: 'var(--accent-purple-1)' }}>
+                                                    {user.overrideAccessKeyLimit === -1 ? '∞' : user.overrideAccessKeyLimit}
+                                                </span>
+                                            ) : (
+                                                user.accessKeyLimit === -1 ? '∞' : (user.accessKeyLimit ?? 'Default')
+                                            )}
+                                        </span>
                                     </td>
                                     <td style={{ padding: '12px 16px' }}>
                                         <button
@@ -180,16 +194,22 @@ export default function UsersPage() {
                                 </div>
                                 <div className="user-card-stats">
                                     <div className="user-card-stat">
-                                        <span className="stat-label">Usage</span>
-                                        <span className="stat-value">{user.currentRequestUsage ?? 0}</span>
-                                    </div>
-                                    <div className="user-card-stat">
-                                        <span className="stat-label">Limit</span>
+                                        <span className="stat-label">Requests</span>
                                         <span className={`stat-value ${user.overrideRequestLimit ? 'override' : ''}`}>
-                                            {user.overrideRequestLimit ? (
+                                            {user.currentRequestUsage ?? 0} / {user.overrideRequestLimit !== undefined && user.overrideRequestLimit !== null ? (
                                                 <>{user.overrideRequestLimit === -1 ? '∞' : user.overrideRequestLimit} <small>(Override)</small></>
                                             ) : (
                                                 user.requestLimit === -1 ? '∞' : (user.requestLimit ?? 'Default')
+                                            )}
+                                        </span>
+                                    </div>
+                                    <div className="user-card-stat">
+                                        <span className="stat-label">Access Keys</span>
+                                        <span className={`stat-value ${user.overrideAccessKeyLimit ? 'override' : ''}`}>
+                                            {user.accessKeys?.length ?? 0} / {user.overrideAccessKeyLimit !== undefined && user.overrideAccessKeyLimit !== null ? (
+                                                <>{user.overrideAccessKeyLimit === -1 ? '∞' : user.overrideAccessKeyLimit} <small>(Override)</small></>
+                                            ) : (
+                                                user.accessKeyLimit === -1 ? '∞' : (user.accessKeyLimit ?? 'Default')
                                             )}
                                         </span>
                                     </div>
