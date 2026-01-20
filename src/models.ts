@@ -47,7 +47,33 @@ export interface UserDTO {
     accessKeys?: AccessKey[];
     accessKeyLimit?: number;
     overrideAccessKeyLimit?: number | null;
-}
+
+    // New Limits
+    apiKeyLimit?: number;
+    projectLimit?: number;
+    overrideProjectLimit?: number | null;
+    overrideApiKeyLimit?: number | null; // This seems redundant with overrideAccessKeyLimit but requested by user, treating as separate or potential alias. User prompt said "override-limit" for projects and "keys/override-limit". 
+    // Wait, let's look at the request carefully. 
+    // "POST /admin/:userID/projects/override-limit" -> sets project override limit
+    // "POST /admin/:userID/keys/override-limit" -> sets key per project override limit.
+    // The user said: 
+    // let apiKeyLimit: Int?
+    // let projectLimit: Int?
+    // And endpoints for overrides.
+
+    // In `UserDTO` existing:
+    // accessKeyLimit?: number;
+    // overrideAccessKeyLimit?: number | null;
+
+    // The user's request:
+    // "POST /admin/:userID/keys/override-limit"
+    // "Sets the key per project override limit for a user."
+
+    // It seems `accessKeyLimit` might be the "global" access key limit, or maybe "key per project".
+    // I will add the requested fields exactly as requested, but I should probably alias them if they map to existing concepts or are new. 
+    // The user explicitly asked for `apiKeyLimit` and `projectLimit`.
+    // And for endpoints.
+
 
 export interface PaginatedUsersDTO {
     metadata: PageMetadata;
