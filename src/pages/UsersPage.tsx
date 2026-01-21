@@ -104,6 +104,8 @@ export default function UsersPage() {
                                 <th style={{ padding: '12px 16px', color: 'var(--text-secondary)', fontWeight: 600 }}>User</th>
                                 <th style={{ padding: '12px 16px', color: 'var(--text-secondary)', fontWeight: 600 }}>Requests</th>
                                 <th style={{ padding: '12px 16px', color: 'var(--text-secondary)', fontWeight: 600 }}>Access Keys</th>
+                                <th style={{ padding: '12px 16px', color: 'var(--text-secondary)', fontWeight: 600 }}>Projects</th>
+                                <th style={{ padding: '12px 16px', color: 'var(--text-secondary)', fontWeight: 600 }}>Keys / Proj</th>
                                 <th style={{ padding: '12px 16px', color: 'var(--text-secondary)', fontWeight: 600 }}>Actions</th>
                             </tr>
                         </thead>
@@ -145,6 +147,31 @@ export default function UsersPage() {
                                                 </span>
                                             ) : (
                                                 user.accessKeyLimit === -1 ? '∞' : (user.accessKeyLimit ?? 'Default')
+                                            )}
+                                        </span>
+                                    </td>
+                                    <td style={{ padding: '12px 16px' }}>
+                                        <span style={{ color: 'var(--text-primary)' }}>
+                                            {user.projects?.length ?? 0}
+                                        </span>
+                                        <span style={{ color: 'var(--text-muted)', marginLeft: '4px' }}>
+                                            / {user.overrideProjectLimit !== undefined && user.overrideProjectLimit !== null ? (
+                                                <span style={{ color: 'var(--accent-purple-1)' }}>
+                                                    {user.overrideProjectLimit === -1 ? '∞' : user.overrideProjectLimit}
+                                                </span>
+                                            ) : (
+                                                user.projectLimit === -1 ? '∞' : (user.projectLimit ?? 'Default')
+                                            )}
+                                        </span>
+                                    </td>
+                                    <td style={{ padding: '12px 16px' }}>
+                                        <span style={{ color: 'var(--text-muted)' }}>
+                                            Limit: {user.overrideApiKeyLimit !== undefined && user.overrideApiKeyLimit !== null ? (
+                                                <span style={{ color: 'var(--accent-purple-1)' }}>
+                                                    {user.overrideApiKeyLimit === -1 ? '∞' : user.overrideApiKeyLimit}
+                                                </span>
+                                            ) : (
+                                                user.apiKeyLimit === -1 ? '∞' : (user.apiKeyLimit ?? 'Default')
                                             )}
                                         </span>
                                     </td>
@@ -213,6 +240,27 @@ export default function UsersPage() {
                                             )}
                                         </span>
                                     </div>
+
+                                    <div className="user-card-stat">
+                                        <span className="stat-label">Projects</span>
+                                        <span className={`stat-value ${user.overrideProjectLimit ? 'override' : ''}`}>
+                                            {user.projects?.length ?? 0} / {user.overrideProjectLimit !== undefined && user.overrideProjectLimit !== null ? (
+                                                <>{user.overrideProjectLimit === -1 ? '∞' : user.overrideProjectLimit} <small>(Override)</small></>
+                                            ) : (
+                                                user.projectLimit === -1 ? '∞' : (user.projectLimit ?? 'Default')
+                                            )}
+                                        </span>
+                                    </div>
+                                    <div className="user-card-stat">
+                                        <span className="stat-label">Keys / Proj</span>
+                                        <span className={`stat-value ${user.overrideApiKeyLimit ? 'override' : ''}`}>
+                                            Limit: {user.overrideApiKeyLimit !== undefined && user.overrideApiKeyLimit !== null ? (
+                                                <>{user.overrideApiKeyLimit === -1 ? '∞' : user.overrideApiKeyLimit} <small>(Override)</small></>
+                                            ) : (
+                                                user.apiKeyLimit === -1 ? '∞' : (user.apiKeyLimit ?? 'Default')
+                                            )}
+                                        </span>
+                                    </div>
                                 </div>
                                 <button
                                     className="btn-solid user-card-edit"
@@ -250,13 +298,15 @@ export default function UsersPage() {
                 </button>
             </div>
 
-            {selectedUser && (
-                <UserActionModal
-                    isOpen={isModalOpen}
-                    onClose={handleModalClose}
-                    user={selectedUser}
-                />
-            )}
-        </div>
+            {
+                selectedUser && (
+                    <UserActionModal
+                        isOpen={isModalOpen}
+                        onClose={handleModalClose}
+                        user={selectedUser}
+                    />
+                )
+            }
+        </div >
     );
 }

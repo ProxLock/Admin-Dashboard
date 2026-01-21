@@ -26,3 +26,17 @@ export const lookupUser = async (userId: string): Promise<User> => {
     const { data } = await api.get<User>(`/admin/${userId}/user`);
     return data;
 };
+
+export const setProjectLimit = async (userId: string, limit: number | null): Promise<User> => {
+    const { data } = await api.post<User>(`/admin/${userId}/projects/override-limit`, limit, {
+        headers: { 'Content-Type': 'application/json' }
+    });
+    return data;
+}
+
+export const setApiKeyLimit = async (userId: string, limit: number | null): Promise<User> => {
+    const { data } = await api.post<User>(`/admin/${userId}/keys/override-limit`, limit, {
+        headers: { 'Content-Type': 'application/json' }
+    });
+    return data;
+}
