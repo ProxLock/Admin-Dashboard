@@ -19,6 +19,14 @@ export default function UserActionModal({ isOpen, onClose, user }: UserActionMod
     const [accessKeyLimit, setAccessKeyLimit] = useState('');
     const [isAccessKeyUnlimited, setIsAccessKeyUnlimited] = useState(false);
 
+    // Project Limit Override State
+    const [projectLimit, setProjectLimit] = useState('');
+    const [isProjectLimitUnlimited, setIsProjectLimitUnlimited] = useState(false);
+
+    // API Key Limit Override State
+    const [apiKeyLimit, setApiKeyLimit] = useState('');
+    const [isApiKeyLimitUnlimited, setIsApiKeyLimitUnlimited] = useState(false);
+
     // Initialize state when modal opens or user changes
     useEffect(() => {
         if (isOpen && user) {
@@ -40,6 +48,26 @@ export default function UserActionModal({ isOpen, onClose, user }: UserActionMod
             } else {
                 setAccessKeyLimit((currentAccessKeyLimit ?? '').toString());
                 setIsAccessKeyUnlimited(false);
+            }
+
+            // Project Limit
+            const currentProjectLimit = user.overrideProjectLimit ?? user.projectLimit;
+            if (currentProjectLimit === -1) {
+                setIsProjectLimitUnlimited(true);
+                setProjectLimit('');
+            } else {
+                setProjectLimit((currentProjectLimit ?? '').toString());
+                setIsProjectLimitUnlimited(false);
+            }
+
+            // API Key Limit
+            const currentApiKeyLimit = user.overrideApiKeyLimit ?? user.apiKeyLimit;
+            if (currentApiKeyLimit === -1) {
+                setIsApiKeyLimitUnlimited(true);
+                setApiKeyLimit('');
+            } else {
+                setApiKeyLimit((currentApiKeyLimit ?? '').toString());
+                setIsApiKeyLimitUnlimited(false);
             }
         }
     }, [isOpen, user]);
@@ -65,11 +93,33 @@ export default function UserActionModal({ isOpen, onClose, user }: UserActionMod
                 accessKeyBody = accessKeyLimit === '' ? null : parseInt(accessKeyLimit, 10);
             }
 
+            // Save Project Limit
+            let projectBody: number | null = null;
+            if (isProjectLimitUnlimited) {
+                projectBody = -1;
+            } else {
+                projectBody = projectLimit === '' ? null : parseInt(projectLimit, 10);
+            }
+
+            // Save API Key Limit
+            let apiKeyBody: number | null = null;
+            if (isApiKeyLimitUnlimited) {
+                apiKeyBody = -1;
+            } else {
+                apiKeyBody = apiKeyLimit === '' ? null : parseInt(apiKeyLimit, 10);
+            }
+
             await Promise.all([
                 api.post(`/admin/${user.id}/user/override-limit`, requestBody, {
                     headers: { 'Content-Type': 'application/json' }
                 }),
                 api.post(`/admin/${user.id}/user/api-keys/override-limit`, accessKeyBody, {
+                    headers: { 'Content-Type': 'application/json' }
+                }),
+                api.post(`/admin/${user.id}/projects/override-limit`, projectBody, {
+                    headers: { 'Content-Type': 'application/json' }
+                }),
+                api.post(`/admin/${user.id}/keys/override-limit`, apiKeyBody, {
                     headers: { 'Content-Type': 'application/json' }
                 })
             ]);
@@ -108,6 +158,36 @@ export default function UserActionModal({ isOpen, onClose, user }: UserActionMod
         } catch (err) {
             console.error("Failed to remove request override", err);
             alert("Failed to remove request override");
+        } finally {
+            setUpdating(false);
+        }
+    };
+
+    const handleRemoveProjectOverride = async () => {
+        setUpdating(true);
+        try {
+            await api.post(`/admin/${user.id}/projects/override-limit`, null, {
+                headers: { 'Content-Type': 'application/json' }
+            });
+            onClose(true);
+        } catch (err) {
+            console.error("Failed to remove project override", err);
+            alert("Failed to remove project override");
+        } finally {
+            setUpdating(false);
+        }
+    };
+
+    const handleRemoveApiKeyOverride = async () => {
+        setUpdating(true);
+        try {
+            await api.post(`/admin/${user.id}/keys/override-limit`, null, {
+                headers: { 'Content-Type': 'application/json' }
+            });
+            onClose(true);
+        } catch (err) {
+            console.error("Failed to remove api key override", err);
+            alert("Failed to remove api key override");
         } finally {
             setUpdating(false);
         }
@@ -215,6 +295,98 @@ export default function UserActionModal({ isOpen, onClose, user }: UserActionMod
                                 onChange={(e) => {
                                     setIsAccessKeyUnlimited(e.target.checked);
                                     if (e.target.checked) setAccessKeyLimit('');
+                                }}
+                                style={{ width: '16px', height: '16px' }}
+                            />
+                            <span style={{ color: 'var(--text-primary)' }}>Unlimited</span>
+                        </label>
+                    </div>
+                </div>
+
+                {/* Project Limit Section */}
+                <div style={{ marginBottom: '1.5rem' }}>
+                    <label style={{ display: 'block', marginBottom: '0.5rem', color: 'var(--text-secondary)', fontWeight: 500 }}>
+                        Override Project Limit
+                        {user.overrideProjectLimit !== undefined && user.overrideProjectLimit !== null && (
+                            <button
+                                onClick={handleRemoveProjectOverride}
+                                disabled={updating}
+                                style={{ marginLeft: '10px', background: 'transparent', border: 'none', color: 'var(--color-error)', cursor: 'pointer', fontSize: '0.85rem', textDecoration: 'underline' }}
+                            >
+                                Remove Override
+                            </button>
+                        )}
+                    </label>
+                    <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+                        <input
+                            type="number"
+                            value={projectLimit}
+                            onChange={(e) => setProjectLimit(e.target.value)}
+                            placeholder={isProjectLimitUnlimited ? "Unlimited" : "Enter limit"}
+                            disabled={isProjectLimitUnlimited}
+                            style={{
+                                flex: 1,
+                                padding: '8px 12px',
+                                backgroundColor: isProjectLimitUnlimited ? 'var(--bg-card)' : 'var(--bg-input)',
+                                border: '1px solid var(--border-default)',
+                                borderRadius: '6px',
+                                color: 'var(--text-primary)',
+                                opacity: isProjectLimitUnlimited ? 0.5 : 1
+                            }}
+                        />
+                        <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.9rem', cursor: 'pointer', userSelect: 'none' }}>
+                            <input
+                                type="checkbox"
+                                checked={isProjectLimitUnlimited}
+                                onChange={(e) => {
+                                    setIsProjectLimitUnlimited(e.target.checked);
+                                    if (e.target.checked) setProjectLimit('');
+                                }}
+                                style={{ width: '16px', height: '16px' }}
+                            />
+                            <span style={{ color: 'var(--text-primary)' }}>Unlimited</span>
+                        </label>
+                    </div>
+                </div>
+
+                {/* API Key Limit Section */}
+                <div style={{ marginBottom: '1.5rem' }}>
+                    <label style={{ display: 'block', marginBottom: '0.5rem', color: 'var(--text-secondary)', fontWeight: 500 }}>
+                        Override API Key Limit
+                        {user.overrideApiKeyLimit !== undefined && user.overrideApiKeyLimit !== null && (
+                            <button
+                                onClick={handleRemoveApiKeyOverride}
+                                disabled={updating}
+                                style={{ marginLeft: '10px', background: 'transparent', border: 'none', color: 'var(--color-error)', cursor: 'pointer', fontSize: '0.85rem', textDecoration: 'underline' }}
+                            >
+                                Remove Override
+                            </button>
+                        )}
+                    </label>
+                    <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+                        <input
+                            type="number"
+                            value={apiKeyLimit}
+                            onChange={(e) => setApiKeyLimit(e.target.value)}
+                            placeholder={isApiKeyLimitUnlimited ? "Unlimited" : "Enter limit"}
+                            disabled={isApiKeyLimitUnlimited}
+                            style={{
+                                flex: 1,
+                                padding: '8px 12px',
+                                backgroundColor: isApiKeyLimitUnlimited ? 'var(--bg-card)' : 'var(--bg-input)',
+                                border: '1px solid var(--border-default)',
+                                borderRadius: '6px',
+                                color: 'var(--text-primary)',
+                                opacity: isApiKeyLimitUnlimited ? 0.5 : 1
+                            }}
+                        />
+                        <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.9rem', cursor: 'pointer', userSelect: 'none' }}>
+                            <input
+                                type="checkbox"
+                                checked={isApiKeyLimitUnlimited}
+                                onChange={(e) => {
+                                    setIsApiKeyLimitUnlimited(e.target.checked);
+                                    if (e.target.checked) setApiKeyLimit('');
                                 }}
                                 style={{ width: '16px', height: '16px' }}
                             />
