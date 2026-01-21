@@ -75,6 +75,8 @@ export interface UserDTO {
     // And for endpoints.
 
 
+}
+
 export interface PaginatedUsersDTO {
     metadata: PageMetadata;
     users: UserDTO[];
